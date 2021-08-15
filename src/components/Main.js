@@ -19,13 +19,13 @@ class Main extends React.Component {
       showModal: false,
       errorName: 0,
       errorData: '',
-    }
+    };
   }
 
   getLocation = async (event) => {
     event.preventDefault();
 
-    await this.setState({ enteredCity: event.target.city.value })
+    await this.setState({ enteredCity: event.target.city.value });
 
     let locationURL = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATION_KEY}&q=${this.state.enteredCity}&format=json`;
     let retrieveData = await axios.get(locationURL)
@@ -39,7 +39,7 @@ class Main extends React.Component {
             showModal: true,
             errorCode: error.response.status,
             errorData: error.response.data,
-          })
+          });
         } else if (error.request) {
           console.log(error.request);
         } else {
@@ -52,20 +52,20 @@ class Main extends React.Component {
       await this.setState({
         locationData: retrieveData.data[0],
         renderData: true,
-      })
+      });
 
 
       let mapURL = `https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATION_KEY}&center=${this.state.locationData.lat},${this.state.locationData.lon}&zoom=18&size=600x600&format=png&maptype=%3CMapType%3E&markers=icon:small-red-blank|${this.state.locationData.lat},${this.state.locationData.lon}`;
 
       await this.setState({
         mapData: mapURL,
-      })
+      });
     }
   }
 
 
   handleClose = () => {
-    this.setState({ showModal: false })
+    this.setState({ showModal: false });
   }
 
   render() {
@@ -136,7 +136,7 @@ class Main extends React.Component {
 
       </>
 
-    )
+    );
   }
 }
 
