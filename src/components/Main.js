@@ -6,6 +6,7 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
+import Weather from './Weather.js';
 
 class Main extends React.Component {
 
@@ -19,6 +20,7 @@ class Main extends React.Component {
       showModal: false,
       errorName: 0,
       errorData: '',
+      forecast: {},
     };
   }
 
@@ -60,6 +62,16 @@ class Main extends React.Component {
       await this.setState({
         mapData: mapURL,
       });
+
+      let weatherURL = `${process.env.REACT_APP_SERVER_URL}/weather?lat=${this.state.locationData.lat}&lon=${this.state.locationData.lon}&q=${this.state.enteredCity}`;
+      // let weatherURL = `http://localhost:3001/weather?lat=47.60621&lon=-122.33207&q=${this.state.enteredCity}`;
+      console.log(weatherURL);
+      let retrieveForecast = await axios.get(weatherURL);
+
+      await this.setState({
+        forecast: retrieveForecast.data,
+      });
+      console.log(this.state.forecast[0].date);
     }
   }
 
@@ -67,7 +79,6 @@ class Main extends React.Component {
   handleClose = () => {
     this.setState({ showModal: false });
   }
-
   render() {
 
     return (
@@ -104,18 +115,9 @@ class Main extends React.Component {
           </Col>
 
           <Col>
-            <Modal show={this.state.showModal}>
-              <Modal.Header>
-                <Modal.Title> Error: {this.state.errorCode}</Modal.Title>
-              </Modal.Header>
-              <Modal.Body> error: {this.state.errorData.error} </Modal.Body>
-              <Modal.Footer>
-                <Button variant="danger" onClick={this.handleClose} >
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
-
+            {this.state.renderData &&
+              <Weather forecast={this.state.forecast} enteredCity={this.state.enteredCity} />
+            }
           </Col>
 
           <Col>
@@ -133,6 +135,20 @@ class Main extends React.Component {
           </Col>
 
         </Row>
+
+
+        <Modal show={this.state.showModal}>
+          <Modal.Header>
+            <Modal.Title> Error: {this.state.errorCode}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body> error: {this.state.errorData.error} </Modal.Body>
+          <Modal.Footer>
+            <Button variant="danger" onClick={this.handleClose} >
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
 
       </>
 
