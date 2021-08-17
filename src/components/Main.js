@@ -87,7 +87,7 @@ class Main extends React.Component {
 
   getMovies = async () => {
     let moviesURL = `${process.env.REACT_APP_SERVER_URL}/movies?q=${this.state.enteredCity}`;
-    // let weatherURL = `http://localhost:3001/weather?lat=47.60621&lon=-122.33207&q=${this.state.enteredCity}`;
+    // let weatherURL = `http://localhost:3001/movies?q=${this.state.enteredCity}`;
     let retrieveMovies = await axios.get(moviesURL)
       .catch((error) => {
         if (error.response) {
