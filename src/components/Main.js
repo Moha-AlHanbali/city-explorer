@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Weather from './Weather.js';
+import Movies from './Movies.js';
 
 class Main extends React.Component {
 
@@ -21,15 +22,16 @@ class Main extends React.Component {
       errorName: 0,
       errorData: '',
       forecast: [],
+      movies: [],
     };
   }
 
-  getLocation = async (event) => {
-    event.preventDefault();
+  getLocation = async () => {
 
     await this.setState({
       enteredCity: event.target.city.value,
       forecast: [],
+      movies: [],
       locationData: {},
       mapData: '',
     });
@@ -58,28 +60,58 @@ class Main extends React.Component {
       await this.setState({
         mapData: mapURL,
       });
-
-      let weatherURL = `${process.env.REACT_APP_SERVER_URL}/weather?lat=${this.state.locationData.lat}&lon=${this.state.locationData.lon}&q=${this.state.enteredCity}`;
-      // let weatherURL = `http://localhost:3001/weather?lat=47.60621&lon=-122.33207&q=${this.state.enteredCity}`;
-      console.log(weatherURL);
-      let retrieveForecast = await axios.get(weatherURL)
-        .catch((error) => {
-          if (error.response) {
-            this.setState({
-              showModal: true,
-              errorCode: error.response.status,
-              errorData: error.response.data,
-            });
-          }
-        });
-
-      await this.setState({
-        forecast: retrieveForecast.data,
-      });
-      console.log(this.state.forecast[0].date);
     }
   }
 
+  getWeather = async () => {
+
+    let weatherURL = `${process.env.REACT_APP_SERVER_URL}/weather?lat=${this.state.locationData.lat}&lon=${this.state.locationData.lon}&q=${this.state.enteredCity}`;
+    // let weatherURL = `http://localhost:3001/weather?lat=47.60621&lon=-122.33207&q=${this.state.enteredCity}`;
+    // console.log(weatherURL);
+    let retrieveForecast = await axios.get(weatherURL)
+      .catch((error) => {
+        if (error.response) {
+          this.setState({
+            showModal: true,
+            errorCode: error.response.status,
+            errorData: error.response.data,
+          });
+        }
+      });
+
+    await this.setState({
+      forecast: retrieveForecast.data,
+    });
+    // console.log(this.state.forecast[0].date);
+  }
+
+  getMovies = async () => {
+    let moviesURL = `${process.env.REACT_APP_SERVER_URL}/movies?q=${this.state.enteredCity}`;
+    // let weatherURL = `http://localhost:3001/movies?q=${this.state.enteredCity}`;
+    let retrieveMovies = await axios.get(moviesURL)
+      .catch((error) => {
+        if (error.response) {
+          this.setState({
+            showModal: true,
+            errorCode: error.response.status,
+            errorData: error.response.data,
+          });
+        }
+      });
+
+    await this.setState({
+      movies: retrieveMovies.data,
+    });
+    console.log(this.state);
+  }
+
+  getData = async (event) => {
+    event.preventDefault();
+
+    await this.getLocation();
+    await this.getWeather();
+    await this.getMovies();
+  }
 
   handleClose = () => {
     this.setState({ showModal: false });
@@ -98,7 +130,7 @@ class Main extends React.Component {
         <br />
         <Row xs={1} md={2} className="g-4">
           <Col>
-            <Form onSubmit={this.getLocation} style={{ paddingLeft: '5%' }}>
+            <Form onSubmit={this.getData} style={{ paddingLeft: '5%' }}>
               <Form.Group className="mb-3" controlId="formHorizontalEmail">
                 <Form.Control type="text" name="city" placeholder="Enter a city name here..." style={{ marginTop: '2.5%' }} />
               </Form.Group>
@@ -106,6 +138,22 @@ class Main extends React.Component {
                 <Button variant="dark" type="submit" style={{ width: '100%', marginTop: '2.5%' }}>Explore!</Button>
               </Form.Group>
             </Form>
+
+            {this.state.renderData &&
+
+              <Card style={{ marginLeft: '5%', textAlign: 'center', fontSize: '16px', fontWeight: 'bold' }}>
+                <Card.Body>
+                  <ul>
+                    <li>City: {this.state.enteredCity}</li>
+                    <br />
+                    <li>Lon: {this.state.locationData.lat}</li>
+                    <br />
+                    <li>Lat: {this.state.locationData.lon}</li>
+                  </ul>
+                </Card.Body>
+              </Card>
+            }
+
           </Col>
 
           <Col>
@@ -127,15 +175,7 @@ class Main extends React.Component {
 
           <Col>
             {this.state.renderData &&
-
-              <Card style={{ width: '600px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold' }}>
-                <Card.Body> City: {this.state.enteredCity}
-                  <br />
-                  Lon: {this.state.locationData.lat}
-                  <br />
-                  Lat: {this.state.locationData.lon}</Card.Body>
-
-              </Card>
+              <Movies movies={this.state.movies} enteredCity={this.state.enteredCity} />
             }
           </Col>
 
