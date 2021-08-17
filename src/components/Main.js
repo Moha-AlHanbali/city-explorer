@@ -20,34 +20,30 @@ class Main extends React.Component {
       showModal: false,
       errorName: 0,
       errorData: '',
-      forecast: {},
+      forecast: [],
     };
   }
 
   getLocation = async (event) => {
     event.preventDefault();
 
-    await this.setState({ enteredCity: event.target.city.value });
+    await this.setState({
+      enteredCity: event.target.city.value,
+      forecast: [],
+      locationData: {},
+      mapData: '',
+    });
 
     let locationURL = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATION_KEY}&q=${this.state.enteredCity}&format=json`;
     let retrieveData = await axios.get(locationURL)
       .catch((error) => {
         if (error.response) {
-
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
           this.setState({
             showModal: true,
             errorCode: error.response.status,
             errorData: error.response.data,
           });
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log('Error', error.message);
         }
-        console.log(error.config);
       });
 
     if (this.state.showModal === false) {
@@ -66,7 +62,16 @@ class Main extends React.Component {
       let weatherURL = `${process.env.REACT_APP_SERVER_URL}/weather?lat=${this.state.locationData.lat}&lon=${this.state.locationData.lon}&q=${this.state.enteredCity}`;
       // let weatherURL = `http://localhost:3001/weather?lat=47.60621&lon=-122.33207&q=${this.state.enteredCity}`;
       console.log(weatherURL);
-      let retrieveForecast = await axios.get(weatherURL);
+      let retrieveForecast = await axios.get(weatherURL)
+        .catch((error) => {
+          if (error.response) {
+            this.setState({
+              showModal: true,
+              errorCode: error.response.status,
+              errorData: error.response.data,
+            });
+          }
+        });
 
       await this.setState({
         forecast: retrieveForecast.data,
