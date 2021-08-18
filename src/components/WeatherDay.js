@@ -27,7 +27,7 @@ class WeatherDay extends React.Component {
             }
           </Card.Body>
         </Card>
-      </>        
+      </>
     );
   }
 
