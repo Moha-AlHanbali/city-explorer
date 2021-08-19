@@ -14,9 +14,9 @@ class WeatherDay extends React.Component {
             <h5>The Week's Forecast</h5>
             <br />
             {
-              this.props.forecast.map((element) => {
+              this.props.forecast.map((element, index) => {
                 return (
-                  <ul>
+                  <ul key={index}>
                     <li>Date: {element.date}</li>
                     <ul>
                       <li> Description: low temp of {element.low} and high of {element.high} with {element.description}.</li>

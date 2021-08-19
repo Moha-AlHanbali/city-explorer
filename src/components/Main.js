@@ -8,6 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Weather from './Weather.js';
 import Movies from './Movies.js';
+import Yelp from './Yelp.js';
 
 class Main extends React.Component {
 
@@ -23,11 +24,11 @@ class Main extends React.Component {
       errorData: '',
       forecast: [],
       movies: [],
+      yelp: [],
     };
   }
 
   getLocation = async () => {
-
     await this.setState({
       enteredCity: event.target.city.value,
       forecast: [],
@@ -87,7 +88,6 @@ class Main extends React.Component {
 
   getMovies = async () => {
     let moviesURL = `${process.env.REACT_APP_SERVER_URL}/movies?q=${this.state.enteredCity}`;
-    // let weatherURL = `http://localhost:3001/movies?q=${this.state.enteredCity}`;
     let retrieveMovies = await axios.get(moviesURL)
       .catch((error) => {
         if (error.response) {
@@ -102,7 +102,25 @@ class Main extends React.Component {
     await this.setState({
       movies: retrieveMovies.data,
     });
-    console.log(this.state);
+    console.log(retrieveMovies);
+  }
+
+  getYelp = async () => {
+    let yelpURL = `${process.env.REACT_APP_SERVER_URL}/yelp?q=${this.state.enteredCity}`;
+    let retrieveYelp = await axios.get(yelpURL)
+      .catch((error) => {
+        if (error.response) {
+          this.setState({
+            showModal: true,
+            errorCode: error.response.status,
+            errorData: error.response.data,
+          });
+        }
+      });
+
+    await this.setState({
+      yelp: retrieveYelp.data,
+    });
   }
 
   getData = async (event) => {
@@ -111,6 +129,9 @@ class Main extends React.Component {
     await this.getLocation();
     await this.getWeather();
     await this.getMovies();
+    await this.getYelp();
+    console.log(this.state);
+
   }
 
   handleClose = () => {
@@ -159,7 +180,7 @@ class Main extends React.Component {
           <Col>
             {this.state.renderData &&
 
-              <Card style={{ width: '600px' }}>
+              <Card style={{ width: '300px', margin: 'auto' }}>
                 {this.state.renderData &&
                   <Card.Img variant="top" src={this.state.mapData} />
                 }
@@ -170,6 +191,10 @@ class Main extends React.Component {
           <Col>
             {this.state.renderData &&
               <Weather forecast={this.state.forecast} enteredCity={this.state.enteredCity} />
+            }
+
+            {this.state.renderData &&
+            <Yelp yelp={this.state.yelp} />
             }
           </Col>
 
