@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 
-class Movie extends React.Component {
+class YelpRestaurant extends React.Component {
 
   render() {
     let timeStamp;
@@ -11,27 +11,28 @@ class Movie extends React.Component {
         <Card>
           <Card.Body>
             {/* <h4>City: {this.props.enteredCity}</h4> */}
-            <h5>As seen on:</h5>
+            <h5>Our food picks</h5>
             <br />
             {
-              this.props.movies.map((element, index) => {
+              this.props.yelp.map((element, index) => {
                 timeStamp = element.timeStamp;
-                let posterImage = 'https://image.tmdb.org/t/p/w500' + element.poster;
                 return (
                   <ul key={index}>
-                    <li>Title: {element.title}</li>
+                    <li>Restaurant: {element.businesseName}</li>
                     <ul>
-                      <li>Release Date: {element.date}</li>
-                      <li> Description: {element.overview}</li>
+                      <li>Cuisine: {element.category}</li>
+                      <li> Price: {element.price}</li>
+                      <li> Reviews: {element.reviews}</li>
+                      <li>Rating: {element.rating}</li>
                       <li>
-                        <Card.Img variant="top" src={posterImage} />
+                        <Card.Img variant="top" src={element.image} />
                       </li>
                     </ul>
                   </ul>
                 );
               })
             }
-            <p>Movies list last updated on: {timeStamp}</p>
+            <p>Restaurants list last updated on: {timeStamp}</p>
           </Card.Body>
         </Card>
       </>
@@ -40,4 +41,4 @@ class Movie extends React.Component {
 
 }
 
-export default Movie;
+export default YelpRestaurant;
